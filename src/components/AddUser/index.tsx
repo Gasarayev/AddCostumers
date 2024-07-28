@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -13,7 +14,7 @@ function AddUser({user, setUser, userId, setUserId}){
     const [error, setError] =useState<string>('');
 
 
-    const handleAddUser = () =>{
+    const handleAddUser = async () =>{
 
         if(companyName.trim() === '' || contactTitle.trim() === '' || city.trim() === '' || country.trim() === '' ){
             setError('Xanalari bosh qalib');
@@ -22,25 +23,35 @@ function AddUser({user, setUser, userId, setUserId}){
 
 
         const newUser = {
-            id: userId,
+            id: userId.toString(),
             companyName,
             contactTitle,
-            city,
-            country,
+            address: {
+                city,
+                country,
+            }
         };
-
-        setUser([...user, newUser]);
-        setCompanyName('');
-        setContactTitle('');
-        setCity('');
-        setCountry('');
-        setUserId(userId + 1);
-        setError('');
+        try{
+            const response = await axios.post('https://northwind.vercel.app/api/customers', newUser);
+            console.log(response.data);
+            console.log('User added:', response.data);
+            setUser([...user, response.data]);
+            setCompanyName('');
+            setContactTitle('');
+            setCity('');
+            setCountry('');
+            setUserId(userId + 1);
+            setError('');
+        }
+        catch (error) {
+            console.log(error);
+            setError(' Error  ');
+        }
     }
 
   return (
     <div>
-        {error && <p onChange={handleAddUser} style={{color:'red'}}>*Xanalari doldurun!!</p>}
+        {error && <p onChange={handleAddUser} style={{color:'red'}}>{error}</p>}
       <Form>
       <Form.Group className="mb-3 d-flex align-items-center" controlId="formBasicEmail">
       <Form.Label className='d-flex justify-content-end me-2' style={{width: "200px"}}><span className='me-1' style={{color: "red"}}>*</span> Company Name: </Form.Label>
@@ -61,7 +72,7 @@ function AddUser({user, setUser, userId, setUserId}){
       </Form.Group>
       
       <div style={{width:"78%"}}>
-      <Button onClick={handleAddUser} variant="primary">
+      <Button onClick={handleAddUser} variant="primary" type="button">
         Submit
       </Button>
       </div> <br />
@@ -72,3 +83,5 @@ function AddUser({user, setUser, userId, setUserId}){
 }
 
 export default AddUser;
+
+

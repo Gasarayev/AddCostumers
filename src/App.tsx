@@ -5,11 +5,9 @@ import AddUser from './components/AddUser'
 import UserTable from './components/UserTables'
 
 function App() {
-  
   const[user, setUser] = useState<string[]>([]);
   const [userId, setUserId] = useState<number>(1);
   
-
   return (
     <>
       <AddUser user={user} setUser={setUser} userId={userId} setUserId={setUserId}/>
